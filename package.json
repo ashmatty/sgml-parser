@@ -1,0 +1,48 @@
+{
+  "name": "sgml-parser",
+  "version": "1.0.0",
+  "description": "Simple SGML parser to produce other formats.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require ts-node/register src/**/*.spec.ts",
+    "build": "tsc",
+    "dev": "nodemon ./src/index.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashmatty/sgml-parser.git"
+  },
+  "keywords": [
+    "SGML"
+  ],
+  "author": "Matthew Gould <mldgould@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ashmatty/sgml-parser/issues"
+  },
+  "homepage": "https://github.com/ashmatty/sgml-parser#readme",
+  "private": true,
+  "dependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^12.0.2",
+    "@types/xml2js": "^0.4.4",
+    "chai": "^4.2.0",
+    "mocha": "^6.1.4",
+    "prettier": "^1.17.0",
+    "readline": "^1.3.0",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.4.5",
+    "xml2js": "^0.4.19"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}
