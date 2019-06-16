@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { parseString } from 'xml2js';
 
 export class SgmlParser {
   /**
@@ -29,12 +30,31 @@ export class SgmlParser {
       .replace(/>\s+</g, '><')
       .replace(/\s+</g, '<')
       .replace(/>\s+/g, '>')
-      .replace(/<(\w+?)>([^<]*)/g, this.checkClosingTagsExist)
+      // .replace(/<(\w+?)>/g, this.checkClosingTagsExist)
       .replace(/<([A-Z0-9_]*)+\.+([A-Z0-9_]*)>([^<]+)/g, '<$1$2>$3')
       .replace(/<(\w+?)>([^<]+)/g, '<$1>$2</$1>')
       .replace(/(\w*)[:](\w+)(?![<]$)/g, '<$1>$2</$1>');
 
     return `<?xml version="1.0" encoding="utf-8" ?><SGML>${ofx}</SGML>`;
+  }
+
+  /**
+   * Converts sgml JSON using xml2js behind the scenes.
+   * @param {string} sgml SGML as a string.
+   * @returns {object} <Promise<object>> Returns a promise, where if successful, will contain a JS object.
+   */
+  public sgmlToJson(sgml: string): Promise<object> {
+    const xml = this.sgmlToXml(sgml);
+    const result = new Promise<object>((resolve, reject) => {
+      parseString(xml, (err, data) => {
+        if (!err) {
+          resolve(data);
+        } else {
+          reject(err);
+        }
+      });
+    });
+    return result;
   }
 
   /**
@@ -53,11 +73,49 @@ export class SgmlParser {
    */
   private checkClosingTagsExist(substring: string, p1: string, p2: string, offset: number, whole: string): string {
     if (!p2 || p2 === '') {
-      const check = whole.search(`</${p1}>`);
-      if (check === -1) {
-        substring = `${substring}</${p1}>`;
-      }
+      // TODO: checking this will not work if there are multiple correct
+      // TODO: closing tags with the exception of (n + 1) tags missing.
+      // Find next closing tag.
+      // const nextClose = whole.match(new RegExp(`<\/${p1}>`, 'g'));
+      // Find next open
+      // const nextOpen = whole.match(new RegExp(`<${p1}`, 'g'));
+
+      const elements = SgmlParser.findOpenClose(p1, whole);
+
+      // if (!!(nextOpen && nextClose) && nextClose.length !== nextOpen.length) {
+      //   substring = `${substring}</${p1}>`;
+      // }
     }
     return substring;
+  }
+
+  private static findOpenClose(name: string, whole: string): object {
+    let openCloses: { opens: number[]; closes: number[] } = {
+      opens: [],
+      closes: [],
+    };
+
+    // Opening elements
+    let check = 0;
+    while (check !== -1) {
+      check = whole.indexOf(`<${name}>`, check);
+      
+      if (check !== -1) {
+        openCloses.opens.push(check);
+        check++;
+      }
+    }
+
+    check = 0;
+    while (check !== -1) {
+      check = whole.indexOf(`</${name}>`, check);
+
+      if (check !== -1) {
+        openCloses.closes.push(check);
+        check++;
+      }
+    }
+
+    return openCloses;
   }
 }

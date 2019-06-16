@@ -4,11 +4,12 @@ import { SgmlParser } from '../';
 
 let api: SgmlParser;
 let result: string;
+let objResult: object;
 const testData: string = `<rec>
 <obj_blk>
 <objid>dbb_50-00-10t</objid>
 <author>John Doe</author>
-<status>Draft</statusApproved
+<status>Draft</status>
 <datemod>12/31/98
 <datecomp>10/14/1997 2:02:52 PM</datecomp>
 <product>dbb</product>
@@ -107,7 +108,7 @@ describe('[Class] SGML Parser', () => {
           expect(JSON.stringify(data)).to.be.a('string');
           done();
         } else {
-          done();
+          done(err);
         }
       });
     });
@@ -137,9 +138,20 @@ describe('[Class] SGML Parser', () => {
           expect(JSON.stringify(data)).to.be.a('string');
           done();
         } else {
-          done();
+          done(err);
         }
       });
+    });
+  });
+
+  describe('[Function] sgmlToJson', () => {
+    beforeEach(async () => {
+      api = new SgmlParser();
+      objResult = await api.sgmlToJson(testData);
+    });
+
+    it('can return a string', () => {
+      expect(objResult).to.be.a('object');
     });
   });
 });
